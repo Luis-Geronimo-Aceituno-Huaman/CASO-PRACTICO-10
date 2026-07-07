@@ -16,6 +16,17 @@
 // CORREGIDO (Caso 6): Incluir configuracion global de errores ANTES de todo
 require_once 'config.php';
 
+// CORREGIDO (Caso 4): Configurar parametros de la cookie de sesion ANTES
+// de session_start(). Mismos atributos de seguridad que login.php.
+// VULNERABLE: session_start() sin configurar cookie_params.
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path'     => '/',
+    'secure'   => true,
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
+
 session_start();
 require_once 'conexion.php';
 require_once 'logger.php';

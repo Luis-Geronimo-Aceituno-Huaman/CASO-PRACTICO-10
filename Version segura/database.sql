@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS comentarios (
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS logs_seguridad (
   id           INT AUTO_INCREMENT PRIMARY KEY,
-  tipo_evento  ENUM('intento_fallido', 'cambio_password', 'acceso_admin', 'modificacion_producto') NOT NULL,
+  tipo_evento  VARCHAR(50) NOT NULL,
   usuario      VARCHAR(50)  DEFAULT NULL,
   ip           VARCHAR(45)  DEFAULT NULL,
   detalle      TEXT,

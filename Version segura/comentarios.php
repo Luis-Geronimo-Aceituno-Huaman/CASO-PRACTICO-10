@@ -17,6 +17,17 @@
 // CORREGIDO (Caso 6): Incluir configuracion global de errores ANTES de todo
 require_once 'config.php';
 
+// CORREGIDO (Caso 4): Configurar parametros de la cookie de sesion ANTES
+// de session_start(). Mismos atributos de seguridad que login.php.
+// VULNERABLE: session_start() sin configurar cookie_params.
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path'     => '/',
+    'secure'   => true,
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
+
 session_start();
 require_once 'conexion.php';
 require_once 'logger.php';
@@ -49,11 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CORREGIDO (Caso 10): Requerir sesion activa para comentar
     // VULNERABLE: La version anterior permitia que cualquier visitante
     // (incluso sin sesion) enviara comentarios, usando id_usuario = 0.
-    if (!isset($_SESSION['id'])) {
+    if (!isset($_SESSION['id_usuario'])) {
         $mensaje = 'Debes iniciar sesion para comentar';
     } else {
 
-        $id_usuario  = $_SESSION['id'];
+        $id_usuario  = $_SESSION['id_usuario'];
         $nombre      = $_POST['nombre']      ?? '';
         $contenido   = $_POST['contenido']   ?? '';
         $id_producto = $_POST['id_producto'] ?? '';
