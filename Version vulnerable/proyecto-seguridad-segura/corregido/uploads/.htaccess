@@ -1,0 +1,64 @@
+# =============================================================
+# .htaccess - Proteccion del directorio uploads/
+# CASO PRACTICO 10 - FastMarket S.A.C.
+#
+# CORREGIDO (Caso 5): Bloqueo de ejecucion de scripts PHP
+# =============================================================
+# VULNERABLE: En la version anterior, un atacante podia subir un
+# archivo PHP (ej: "shell.php" o "imagen.php.jpg") y acceder a
+# el desde el navegador. El servidor Apache ejecutaria el codigo
+# PHP contenido en el archivo, dando al atacante control total
+# del servidor (Remote Code Execution).
+#
+# Este .htaccess impide que Apache ejecute PHP dentro de esta
+# carpeta, incluso si un archivo PHP logra subirse. La defensa
+# funciona en capas:
+#   1. upload.php valida extension, MIME y nombre (primera barrera)
+#   2. Este .htaccess bloquea ejecucion de PHP (segunda barrera)
+#
+# NOTA: Este .htaccess funciona solo con Apache mod_rewrite habilitado.
+# Si usas Nginx, agrega en la configuracion del servidor:
+#
+#   location ~* /uploads/.*\.php$ {
+#       deny all;
+#   }
+# =============================================================
+
+# Bloquear ejecucion de scripts PHP
+# Intercepta cualquier archivo .php (o con variantes como .php5, .phtml)
+# y retorna HTTP 403 Forbidden antes de que Apache lo ejecute.
+<FilesMatch "\.php[0-9]*$">
+    Require all denied
+</FilesMatch>
+
+# Bloquear ejecucion de scripts CGI/Perl/etc.
+<FilesMatch "\.(php|php[0-9]*|phtml|phps|cgi|pl|sh|asp|aspx|jsp)$">
+    Require all denied
+</FilesMatch>
+
+# Deshabilitar opciones de directorio para prevenir enumeracion
+Options -Indexes
+
+# Bloquear acceso a archivos ocultos (archivos que empiezan con .)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# =============================================================
+# Configuracion alternativa para Nginx (agregar en nginx.conf):
+#
+# location /uploads/ {
+#     # Bloquear ejecucion de PHP
+#     location ~ \.php[0-9]*$ {
+#         deny all;
+#     }
+#     # Bloquear scripts CGI
+#     location ~ \.(cgi|pl|sh|asp|aspx|jsp)$ {
+#         deny all;
+#     }
+#     # Bloquear archivos ocultos
+#     location ~ /\. {
+#         deny all;
+#     }
+# }
+# =============================================================
